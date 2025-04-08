@@ -1,0 +1,9 @@
+# Ignore all CSV files
+*.csv
+
+# Keep the sample CSV file
+!sample.csv
+
+# Ignore data folder and its contents
+data/
+data/* 

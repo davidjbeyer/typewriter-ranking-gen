@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tippübung Auswertung</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js einbinden -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Tippübung Auswertung</h1>
+            <p class="header-info">1 Fehler = 10 Sekunden Zeitstrafe</p>
+            <button id="uploadButton" class="upload-button">CSV-Datei hochladen</button>
+        </header>
+        
+        <div class="content-wrapper">
+            <div class="left-column">
+                <div class="podium-card">
+                    <h2>Sieger-Podest</h2>
+                    <div class="podium-container">
+                        <div class="winner-card second-place">
+                            <div class="medal silver">2</div>
+                            <div class="winner-name" id="second-place-name">-</div>
+                            <div class="winner-stats">Silber</div>
+                        </div>
+                        <div class="winner-card first-place">
+                            <div class="medal gold">1</div>
+                            <div class="winner-name" id="first-place-name">-</div>
+                            <div class="winner-stats">Gold</div>
+                        </div>
+                        <div class="winner-card third-place">
+                            <div class="medal bronze">3</div>
+                            <div class="winner-name" id="third-place-name">-</div>
+                            <div class="winner-stats">Bronze</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-section">
+                    <h2>Graph</h2>
+                    <div class="chart-container">
+                        <canvas id="rankingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <div class="results-section">
+                    <h2>Rangliste</h2>
+                    <div class="table-container">
+                        <table id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Rang</th>
+                                    <th>Name</th>
+                                    <th>Zeit</th>
+                                    <th>Fehler</th>
+                                    <th>Punkte</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody">
+                                <!-- Hier werden die Ergebnisse eingefügt -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload Popup -->
+    <div id="uploadPopup" class="upload-popup">
+        <div class="upload-popup-content">
+            <div class="upload-area" id="drop-area">
+                <p>CSV-Datei hier ablegen oder auswählen</p>
+                <div class="upload-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                </div>
+                <p class="upload-hint">Zum Starten bitte eine CSV-Datei hochladen</p>
+                <input type="file" id="fileInput" accept=".csv" style="display: none;">
+            </div>
+            <button id="closePopup" class="close-button">Schließen</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
