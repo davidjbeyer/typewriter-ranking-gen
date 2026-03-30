@@ -50,6 +50,18 @@
             <div class="right-column">
                 <div class="results-section">
                     <h2>Rangliste</h2>
+                    <div class="filter-controls" id="filterControls" style="display: none;">
+                        <label class="filter-toggle">
+                            <input type="checkbox" id="shortenNames">
+                            <span class="toggle-slider"></span>
+                            Namen kürzen (Präfix vor - ausblenden)
+                        </label>
+                        <label class="filter-toggle">
+                            <input type="checkbox" id="hideZeros">
+                            <span class="toggle-slider"></span>
+                            0-Punkte ausblenden
+                        </label>
+                    </div>
                     <div class="table-container">
                         <table id="resultsTable">
                             <thead>

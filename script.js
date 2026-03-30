@@ -6,11 +6,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadButton = document.getElementById('uploadButton');
     const uploadPopup = document.getElementById('uploadPopup');
     const closePopupButton = document.getElementById('closePopup');
+    const shortenNamesCheckbox = document.getElementById('shortenNames');
+    const hideZerosCheckbox = document.getElementById('hideZeros');
+    const filterControls = document.getElementById('filterControls');
+
+    // Gespeicherte Ergebnisse für Filter
+    let currentResults = null;
     
     // Anfangs die Ergebnisbereiche ausblenden
     document.querySelector('.podium-card').style.display = 'none';
     document.querySelector('.left-column').style.display = 'none';
     document.querySelector('.right-column').style.display = 'none';
+
+    // Filter-Event-Listener
+    shortenNamesCheckbox.addEventListener('change', () => {
+        if (currentResults) applyFiltersAndDisplay();
+    });
+    hideZerosCheckbox.addEventListener('change', () => {
+        if (currentResults) applyFiltersAndDisplay();
+    });
     
     // Upload-Button Funktionalität
     uploadButton.addEventListener('click', () => {
@@ -405,30 +419,59 @@ Verfügbare Spalten: ${headers.join(', ')}`);
         return results.sort((a, b) => a.score - b.score);
     }
     
+    function getDisplayName(entry) {
+        let name = getParticipantName(entry);
+        if (shortenNamesCheckbox.checked && name.includes('-')) {
+            name = name.substring(name.indexOf('-') + 1);
+        }
+        return name;
+    }
+
+    function applyFiltersAndDisplay() {
+        let filtered = currentResults;
+        if (hideZerosCheckbox.checked) {
+            filtered = filtered.filter(entry => entry.score > 0);
+        }
+        renderResults(filtered);
+    }
+
     function displayResults(results) {
+        currentResults = results;
+        filterControls.style.display = 'flex';
+        uploadButton.style.display = 'none';
+        renderResults(results);
+    }
+
+    function renderResults(results) {
         resultsBody.innerHTML = '';
         
         // Top-3-Podestplätze füllen mit mehr Details
         if (results.length > 0) {
             const first = results[0];
-            document.getElementById('first-place-name').textContent = getParticipantName(first);
-            // Zusätzliche Statistiken für Gold-Medaille
+            document.getElementById('first-place-name').textContent = getDisplayName(first);
             const firstStats = `${first.score.toFixed(1)} Pkt | ${formatTime(first.timeValue)} | ${first.errorValue} Fehler`;
             document.querySelector('.first-place .winner-stats').textContent = firstStats;
+        } else {
+            document.getElementById('first-place-name').textContent = '-';
+            document.querySelector('.first-place .winner-stats').textContent = 'Gold';
         }
         if (results.length > 1) {
             const second = results[1];
-            document.getElementById('second-place-name').textContent = getParticipantName(second);
-            // Zusätzliche Statistiken für Silber-Medaille
+            document.getElementById('second-place-name').textContent = getDisplayName(second);
             const secondStats = `${second.score.toFixed(1)} Pkt | ${formatTime(second.timeValue)} | ${second.errorValue} Fehler`;
             document.querySelector('.second-place .winner-stats').textContent = secondStats;
+        } else {
+            document.getElementById('second-place-name').textContent = '-';
+            document.querySelector('.second-place .winner-stats').textContent = 'Silber';
         }
         if (results.length > 2) {
             const third = results[2];
-            document.getElementById('third-place-name').textContent = getParticipantName(third);
-            // Zusätzliche Statistiken für Bronze-Medaille
+            document.getElementById('third-place-name').textContent = getDisplayName(third);
             const thirdStats = `${third.score.toFixed(1)} Pkt | ${formatTime(third.timeValue)} | ${third.errorValue} Fehler`;
             document.querySelector('.third-place .winner-stats').textContent = thirdStats;
+        } else {
+            document.getElementById('third-place-name').textContent = '-';
+            document.querySelector('.third-place .winner-stats').textContent = 'Bronze';
         }
         
         results.forEach((entry, index) => {
@@ -441,7 +484,7 @@ Verfügbare Spalten: ${headers.join(', ')}`);
             
             // Name
             const nameCell = document.createElement('td');
-            nameCell.textContent = getParticipantName(entry);
+            nameCell.textContent = getDisplayName(entry);
             row.appendChild(nameCell);
             
             // Zeit formatieren (mm:ss)
@@ -461,9 +504,6 @@ Verfügbare Spalten: ${headers.join(', ')}`);
             
             resultsBody.appendChild(row);
         });
-        
-        // Upload-Button ausblenden, da eine Tabelle hinzugefügt wurde
-        uploadButton.style.display = 'none';
         
         // Diagramm erstellen
         createChart(results);
@@ -531,7 +571,7 @@ Verfügbare Spalten: ${headers.join(', ')}`);
         // Alle Ergebnisse verwenden
         const allResults = results;
         
-        const names = allResults.map(entry => getParticipantName(entry));
+        const names = allResults.map(entry => getDisplayName(entry));
         
         const scores = allResults.map(entry => entry.score);
         const times = allResults.map(entry => entry.timeValue);
