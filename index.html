@@ -5,15 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tippübung Auswertung</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Chart.js einbinden -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container">
+    <!-- Dark Mode Toggle -->
+    <button id="darkModeToggle" class="dark-mode-toggle" title="Dark Mode umschalten">
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+
+    <!-- Startseite -->
+    <div class="landing" id="landing">
+        <div class="landing-content">
+            <div class="landing-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                    <line x1="9" y1="20" x2="15" y2="20"></line>
+                    <line x1="12" y1="4" x2="12" y2="20"></line>
+                </svg>
+            </div>
+            <h1>Tippübung Auswertung</h1>
+            <p class="landing-subtitle">1 Fehler = 10 Sekunden Zeitstrafe</p>
+            <div class="landing-upload" id="landing-drop-area">
+                <div class="upload-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                </div>
+                <p>CSV-Datei hier ablegen oder klicken</p>
+                <input type="file" id="fileInput" accept=".csv" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Hauptinhalt (nach Upload) -->
+    <div class="container" id="mainContent" style="display: none;">
         <header>
             <h1>Tippübung Auswertung</h1>
             <p class="header-info">1 Fehler = 10 Sekunden Zeitstrafe</p>
-            <button id="uploadButton" class="upload-button">CSV-Datei hochladen</button>
+            <button id="uploadButton" class="upload-button">Neue CSV laden</button>
         </header>
         
         <div class="content-wrapper">
@@ -96,7 +140,6 @@
                     </svg>
                 </div>
                 <p class="upload-hint">Zum Starten bitte eine CSV-Datei hochladen</p>
-                <input type="file" id="fileInput" accept=".csv" style="display: none;">
             </div>
             <button id="closePopup" class="close-button">Schließen</button>
         </div>

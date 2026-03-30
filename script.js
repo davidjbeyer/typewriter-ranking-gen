@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const resultsSection = document.querySelector('.results-section');
     const resultsBody = document.getElementById('resultsBody');
-    const dropArea = document.getElementById('drop-area');
     const fileInput = document.getElementById('fileInput');
     const uploadButton = document.getElementById('uploadButton');
     const uploadPopup = document.getElementById('uploadPopup');
@@ -9,14 +7,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const shortenNamesCheckbox = document.getElementById('shortenNames');
     const hideZerosCheckbox = document.getElementById('hideZeros');
     const filterControls = document.getElementById('filterControls');
+    const landing = document.getElementById('landing');
+    const mainContent = document.getElementById('mainContent');
+    const landingDropArea = document.getElementById('landing-drop-area');
+    const dropArea = document.getElementById('drop-area');
+    const darkModeToggle = document.getElementById('darkModeToggle');
 
     // Gespeicherte Ergebnisse für Filter
     let currentResults = null;
-    
-    // Anfangs die Ergebnisbereiche ausblenden
-    document.querySelector('.podium-card').style.display = 'none';
-    document.querySelector('.left-column').style.display = 'none';
-    document.querySelector('.right-column').style.display = 'none';
+
+    // Dark Mode
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+
+    darkModeToggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        if (next === 'light') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        localStorage.setItem('theme', next);
+    });
 
     // Filter-Event-Listener
     shortenNamesCheckbox.addEventListener('change', () => {
@@ -25,72 +40,57 @@ document.addEventListener('DOMContentLoaded', () => {
     hideZerosCheckbox.addEventListener('change', () => {
         if (currentResults) applyFiltersAndDisplay();
     });
-    
-    // Upload-Button Funktionalität
+
+    // Landing-Page Drag & Drop
+    function setupDropArea(area) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            area.addEventListener(eventName, preventDefaults, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            area.addEventListener(eventName, () => area.classList.add('dragover'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            area.addEventListener(eventName, () => area.classList.remove('dragover'), false);
+        });
+        area.addEventListener('drop', handleDrop, false);
+        area.addEventListener('click', () => fileInput.click());
+    }
+
+    setupDropArea(landingDropArea);
+    setupDropArea(dropArea);
+
+    // Upload-Button öffnet Popup (nach Daten geladen)
     uploadButton.addEventListener('click', () => {
         uploadPopup.classList.add('show');
     });
-    
-    // Popup schließen
+
     closePopupButton.addEventListener('click', () => {
         uploadPopup.classList.remove('show');
     });
-    
-    // Popup schließen wenn außerhalb geklickt wird
+
     uploadPopup.addEventListener('click', (e) => {
         if (e.target === uploadPopup) {
             uploadPopup.classList.remove('show');
         }
     });
-    
-    // Drag & Drop Funktionalität
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, preventDefaults, false);
-    });
-    
+
     function preventDefaults(e) {
         e.preventDefault();
         e.stopPropagation();
     }
-    
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, highlight, false);
-    });
-    
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, unhighlight, false);
-    });
-    
-    function highlight() {
-        dropArea.classList.add('dragover');
-    }
-    
-    function unhighlight() {
-        dropArea.classList.remove('dragover');
-    }
-    
-    // CSV-Datei verarbeiten, wenn sie fallen gelassen wird
-    dropArea.addEventListener('drop', handleDrop, false);
-    
+
     function handleDrop(e) {
         const dt = e.dataTransfer;
         const files = dt.files;
-        
         if (files.length) {
             handleFiles(files);
         }
     }
-    
-    // Datei-Input-Änderung behandeln
+
     fileInput.addEventListener('change', function() {
         if (this.files.length) {
             handleFiles(this.files);
         }
-    });
-    
-    // Klick auf den Drag & Drop Bereich
-    dropArea.addEventListener('click', function() {
-        fileInput.click();
     });
     
     function handleFiles(files) {
@@ -183,11 +183,10 @@ Verfügbare Spalten: ${headers.join(', ')}`);
             // Berechne Punktzahl und sortiere
             const results = calculateRanking(data, timeColumn, errorColumn, timeWeight, errorWeight);
             displayResults(results);
-            
-            // Ergebnisbereiche einblenden
-            document.querySelector('.podium-card').style.display = 'block';
-            document.querySelector('.left-column').style.display = 'flex';
-            document.querySelector('.right-column').style.display = 'block';
+
+            // Von Landing zu Hauptinhalt wechseln
+            landing.style.display = 'none';
+            mainContent.style.display = 'flex';
             
         } catch (error) {
             alert(`Fehler beim Verarbeiten der CSV-Datei: ${error.message}`);
@@ -438,7 +437,6 @@ Verfügbare Spalten: ${headers.join(', ')}`);
     function displayResults(results) {
         currentResults = results;
         filterControls.style.display = 'flex';
-        uploadButton.style.display = 'none';
         renderResults(results);
     }
 
@@ -567,8 +565,9 @@ Verfügbare Spalten: ${headers.join(', ')}`);
     // Funktion zum Erstellen des Diagramms
     function createChart(results) {
         const ctx = document.getElementById('rankingChart').getContext('2d');
-        
-        // Alle Ergebnisse verwenden
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const textColor = isDark ? '#e0e0e0' : '#2c3e50';
+
         const allResults = results;
         
         const names = allResults.map(entry => getDisplayName(entry));
@@ -636,26 +635,20 @@ Verfügbare Spalten: ${headers.join(', ')}`);
                     x: {
                         beginAtZero: true,
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
+                            color: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'
                         },
                         ticks: {
-                            font: {
-                                size: 10
-                            },
-                            // Horizontale Achsenbeschriftungen rotieren, wenn vertikale Balken
+                            font: { size: 10 },
+                            color: textColor,
                             maxRotation: useHorizontalBars ? 0 : 45,
                             minRotation: useHorizontalBars ? 0 : 45
                         }
                     },
                     y: {
-                        grid: {
-                            display: false
-                        },
+                        grid: { display: false },
                         ticks: {
-                            font: {
-                                size: 10
-                            },
-                            // Die y-Achse muss bei mehr Teilnehmern angepasst werden
+                            font: { size: 10 },
+                            color: textColor,
                             autoSkip: useHorizontalBars ? false : true,
                             maxTicksLimit: useHorizontalBars ? 1000 : 20
                         }
@@ -665,13 +658,9 @@ Verfügbare Spalten: ${headers.join(', ')}`);
                     title: {
                         display: true,
                         text: 'Alle Teilnehmer',
-                        font: {
-                            size: 14
-                        },
-                        padding: {
-                            top: 5,
-                            bottom: 5
-                        }
+                        font: { size: 14 },
+                        color: textColor,
+                        padding: { top: 5, bottom: 5 }
                     },
                     legend: {
                         position: 'top',
@@ -681,9 +670,8 @@ Verfügbare Spalten: ${headers.join(', ')}`);
                             usePointStyle: true,
                             pointStyle: 'circle',
                             padding: 8,
-                            font: {
-                                size: 10
-                            }
+                            font: { size: 10 },
+                            color: textColor
                         }
                     },
                     tooltip: {
